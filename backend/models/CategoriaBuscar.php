@@ -5,12 +5,12 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Comentarios;
+use common\models\Categoria;
 
 /**
- * CategoriaBuscar represents the model behind the search form about `common\models\Comentarios`.
+ * CategoriaBuscar represents the model behind the search form about `common\models\Categoria`.
  */
-class CategoriaBuscar extends Comentarios
+class CategoriaBuscar extends Categoria
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class CategoriaBuscar extends Comentarios
     public function rules()
     {
         return [
-            [['id', 'id_usuario', 'id_noticia'], 'integer'],
-            [['comentario', 'estado', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'created_by', 'updated_by'], 'integer'],
+            [['categoria', 'seo_slug', 'imagen', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class CategoriaBuscar extends Comentarios
      */
     public function search($params)
     {
-        $query = Comentarios::find();
+        $query = Categoria::find();
 
         // add conditions that should always apply here
 
@@ -60,14 +60,15 @@ class CategoriaBuscar extends Comentarios
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'id_usuario' => $this->id_usuario,
-            'id_noticia' => $this->id_noticia,
+            'created_by' => $this->created_by,
             'created_at' => $this->created_at,
+            'updated_by' => $this->updated_by,
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'comentario', $this->comentario])
-            ->andFilterWhere(['like', 'estado', $this->estado]);
+        $query->andFilterWhere(['like', 'categoria', $this->categoria])
+            ->andFilterWhere(['like', 'seo_slug', $this->seo_slug])
+            ->andFilterWhere(['like', 'imagen', $this->imagen]);
 
         return $dataProvider;
     }

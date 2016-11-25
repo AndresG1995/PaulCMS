@@ -28,38 +28,35 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => 'Inicio',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => 'Acerca', 'url' => ['/site/about']],
-        ['label' => 'Contacto', 'url' => ['/site/contact']],
-    ];
+    
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Registrarse', 'url' => ['/site/signup']];
+        /*$menuItems[] = ['label' => 'Registrarse', 'url' => ['/site/signup']];*/
+        $menuItems[] = ['label' => 'Contactarme', 'url' => ['/user/contact']];
         $menuItems[] = ['label' => 'Iniciar Sesion', 'url' => ['/user/security/login']];
-    } else {
-        $menuItems[] = '<li>'
-                . Html::beginForm(['/blog'], 'post', ['class' => 'navbar-form'])
-                . Html::submitButton(
-                    'Blog',
-                    ['class' => 'btn btn-link']
-                )
-                . Html::endForm()
-                . '</li>'
-		.'<li>'
-		
-            . Html::beginForm(['/site/logout'], 'post')
-            . Html::submitButton(
-                'Cerrar Sesion (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout']
-            )
-            . Html::endForm()
-            . '</li>';
+    } 
+    if (!Yii::$app->user->isGuest){
+	$menuItems[] = ['label' => 'Noticias', 'url' => ['/noticias']];
+        $menuItems[] = ['label' => 'Tecnicas Prueba', 'url' => ['/site/pruebas']];
+        $menuItems[] = [
+                    'label' => Yii::$app->user->identity->username,
+                    'items' => [
+                        [
+                            'label' => 'Ir a Backend',
+                            'url' => ['/../../backend/web']
+                        ],
+                        [
+                            'label' => 'Salir',
+                            'url' => ['/site/logout'],
+                            'linkOptions' => ['data-method' => 'post']
+                        ],
+                    ],
+              ];
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],

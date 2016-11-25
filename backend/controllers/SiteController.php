@@ -9,6 +9,8 @@ use common\models\LoginForm;
 
 /**
  * Site controller
+{
+    /**
  */
 class SiteController extends Controller
 {

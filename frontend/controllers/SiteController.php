@@ -12,7 +12,7 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
-
+use common\models\Noticia;
 /**
  * Site controller
  */
@@ -209,5 +209,49 @@ class SiteController extends Controller
         return $this->render('resetPassword', [
             'model' => $model,
         ]);
+    }
+    
+    public function actionNoticia($slug) {
+
+        //$categorias = \common\models\Categoria::find()->all();
+        //$noticiaC = \common\models\Noticia::find()->where(['seo_slug' => $slug])->one();
+
+        //$modelComentario = new \common\models\Comentarios();
+
+        $noticia = (new Noticia)->getAllLeft($slug); // ---> CONSULTA COMPLETA
+        
+        
+        //$comentarioQuery = \common\models\Comentarios::getAllLeft($slug); // ---> CONSULTA COMPLETA 
+
+//        if ($modelComentario->load(Yii::$app->request->post())) {
+//
+//
+//            $modelComentario->id_noticia = $noticiaC->id;
+//
+//
+//
+//
+//            if ($modelComentario->save()) {
+//
+//                Yii::$app->session->setFlash('success', 'Gracias por su comentario');
+//            } else {
+//                $modelComentario->getErrors();
+//                Yii::$app->session->setFlash('error', 'Su comentario no pudo ser registrado');
+//            }
+//
+//            return $this->redirect(["/noticia/$slug"]);
+//        }
+
+        return $this->render(
+                        'noticia', [
+                    //'comentario' => $modelComentario,
+                    //'categorias'    => $categorias,
+                    'noticia' => $noticia,
+                        ]
+        );
+    }
+   
+    public function actionPruebas() {
+        return $this->render('pruebas');
     }
 }

@@ -7,6 +7,7 @@ use common\models\Noticia;
 use backend\models\NoticiaBuscar;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
 /**
@@ -20,6 +21,25 @@ class NoticiaController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                    [
+                        'actions' => [ 'logout','index', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['user','Marc'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -82,7 +102,9 @@ class NoticiaController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $Noticia  = Noticia::findOne(['created_by'=>Yii::$app->user->identity]);
+       if (isset($Noticia) || Yii::$app->user->can('admin')){
+          $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -90,7 +112,13 @@ class NoticiaController extends Controller
             return $this->render('update', [
                 'model' => $model,
             ]);
+        }          
+        } else {
+            throw new \yii\web\HttpException(403,'No permitido, Ud solo puede actualizar sus noticias.');
+         
         }
+        
+        
     }
 
     /**
@@ -101,9 +129,17 @@ class NoticiaController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        //BORRAR NOTICIA SOLO SI ERES EL CREADOR DE LA NOTICIA O ADMIN
+       $Noticia  = Noticia::findOne(['created_by'=>Yii::$app->user->identity]);
+       if (isset($Noticia) || Yii::$app->user->can('admin')){
+                    $this->findModel($id)->delete();
+                    return $this->redirect(['index']);
+        } else {
+            throw new \yii\web\HttpException(403,'No permitido, Ud solo puede borrar sus noticias.');
+         
+            die;
+        }
 
-        return $this->redirect(['index']);
     }
 
     /**

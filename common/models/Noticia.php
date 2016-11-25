@@ -1,7 +1,10 @@
 <?php
 
 namespace common\models;
-
+use \yii\behaviors\SluggableBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+use \yii\behaviors\BlameableBehavior;
 use Yii;
 
 /**
@@ -38,7 +41,7 @@ class Noticia extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['titulo', 'seo_slug', 'detalle', 'categoria_id', 'created_by', 'created_at', 'updated_by', 'updated_at'], 'required'],
+            [['titulo', 'detalle', 'categoria_id'], 'required'],
             [['categoria_id', 'created_by', 'updated_by'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['titulo', 'seo_slug'], 'string', 'max' => 100],
@@ -97,5 +100,43 @@ class Noticia extends \yii\db\ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(User::className(), ['id' => 'updated_by']);
+    }
+    
+     public function behaviors() {
+        return [
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+            'blameable' => [
+                'class' => BlameableBehavior::className(),
+                'createdByAttribute' => 'created_by',
+                'updatedByAttribute' => 'updated_by',
+            ],
+            [
+                'class' => SluggableBehavior::className(),
+                'attribute' => 'titulo',
+                'slugAttribute' => 'seo_slug',
+            ],            
+        ];
+    }
+    public function getAllLeft($slug){
+        
+        $query = new \yii\db\Query();
+        $query
+            ->select(['noticia.*', 'noticia.id AS n_id', 'noticia.titulo AS n_ti', 'noticia.seo_slug AS n_seo', 'noticia.detalle AS n_de', 'noticia.categoria_id AS n_cat', 'noticia.created_by AS n_cre', 'noticia.created_at AS n_creat', 'noticia.updated_by AS n_up', 'noticia.updated_at AS n_upd'])
+            ->from('noticia')
+            ->where(['noticia.seo_slug' => $slug]); // COMENTARIOS APROBADOS TAMBIEN EN EL ARRAY
+        
+            
+        $cmd = $query->createCommand();
+        $posts = $cmd->queryAll();
+
+        
+        return $posts;
     }
 }

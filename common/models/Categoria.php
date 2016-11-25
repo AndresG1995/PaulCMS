@@ -2,6 +2,11 @@
 
 namespace common\models;
 
+use \yii\behaviors\SluggableBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+use \yii\behaviors\BlameableBehavior;
+use yii\web\UploadedFile;
 use Yii;
 
 /**
@@ -36,7 +41,7 @@ class Categoria extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['categoria', 'seo_slug', 'created_by', 'created_at', 'updated_by', 'updated_at'], 'required'],
+            [['categoria'], 'required'],
             [['created_by', 'updated_by'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['categoria', 'imagen'], 'string', 'max' => 45],
@@ -85,5 +90,23 @@ class Categoria extends \yii\db\ActiveRecord
     public function getNoticias()
     {
         return $this->hasMany(Noticia::className(), ['categoria_id' => 'id']);
+    }
+    
+     public function behaviors() {
+        return [
+            'timestamp' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+            'blameable' => [
+                'class' => BlameableBehavior::className(),
+                'createdByAttribute' => 'created_by',
+                'updatedByAttribute' => 'updated_by',
+            ],           
+        ];
     }
 }
