@@ -31,7 +31,7 @@ use common\widgets\Alert;
         ?><br>    
 
 
-    Publicado por <?=
+    Publicado por: <?=
     ArrayHelper::getValue(\dektrium\user\models\User::findOne(['id'=>ArrayHelper::getValue($noticia, function ($noticia, $defaultValue) {
         return $noticia[0]['n_cre'];
     })]), 'username')
